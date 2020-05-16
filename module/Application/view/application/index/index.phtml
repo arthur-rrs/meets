@@ -1,0 +1,64 @@
+<a href="/add_car" class="btn btn-primary mb-3">Novo Carro</a>
+<form class="form-inline">
+    <label class="sr-only" for="plate-input">Plate</label>
+    <input id="plate" type="text" class="form-control mb-2 mr-sm-2" placeholder="Pesquisar por placa.">
+    <button type="submit" class="btn btn-primary mb-2">Pesquisar</button>
+</form>
+<p id="helper">Carregando...</p>
+<table class="table table-hover table-striped">
+    <thead>
+        <tr>
+            <th>#</th>
+            <th>Placa</th>
+            <th>Modelo</th>
+            <th>Marca</th>
+            <th>Tipo</th>
+            <th>Ano</th>
+        </tr>
+    </thead>
+    <tbody>
+    </tbody>
+</table>
+<?= $this->inlineScript()
+    ->prependFile($this->basePath('js/services.js'))
+?>
+<script>
+    $(document).ready(function() {
+        services
+            .findCarsByPlate('')
+            .then(renderRows);
+        $('form').submit(findCarsByPlate);
+    });
+
+    function findCarsByPlate(event) {
+        $('#helper').text('procurando..');
+        event.preventDefault();
+        const plate = $('#plate').val();
+        $tbody = $('tbody').empty();
+        services
+            .findCarsByPlate(plate)
+            .then(renderRows);
+    };
+
+    function renderRows(cars) {
+        $tbody = $('tbody');
+        $('#helper').text('');
+        $tbody.empty();
+        if (!cars.length) {
+            $tbody.append('<tr><td colspan="6">Nenhum registro encontrado.' +
+                '</td></tr>');
+        }
+        cars.forEach(car => {
+            const row = "<tr>" +
+                "<td>" + car.id + '</td>' +
+                "<td>" + car.plate + '</td>' +
+                "<td>" + car.model + '</td>' +
+                "<td>" + car.make + '</td>' +
+                "<td>" + car.class + '</td>' +
+                "<td>" + car.year_of + '</td>' +
+                "</tr>";
+            $tbody.append(row);
+        });
+
+    }
+</script>
